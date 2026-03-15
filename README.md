@@ -8,7 +8,7 @@ The system integrates machine learning models, a FastAPI backend, and a Streamli
 🚀 Project Overview
 
 Renewable energy systems often rely on multiple sources like solar and wind.
-```
+
 This project builds an AI-powered hybrid energy prediction platform that:
 	•	Predicts solar power generation
 	•	Predicts wind power generation
@@ -16,7 +16,7 @@ This project builds an AI-powered hybrid energy prediction platform that:
 	•	Recommends the best energy source
 	•	Provides AI explanation for decisions
 	•	Displays results through an interactive dashboard
-```
+
 ```
 🧠 System Architecture
 User Interface (Streamlit)
