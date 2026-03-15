@@ -56,7 +56,7 @@ Utilities
 ⸻
 
 📂 Project Structure
-
+```
 AI-Powered-Hybrid-Energy-Source-Predictor
 │
 ├── api
@@ -86,7 +86,7 @@ AI-Powered-Hybrid-Energy-Source-Predictor
 │
 ├── requirements.txt
 └── README.md
-
+```
 ⚙️ Installation
 
 Clone the repository
