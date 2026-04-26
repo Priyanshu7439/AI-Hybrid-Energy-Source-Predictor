@@ -68,9 +68,13 @@ if st.button("Predict Energy"):
     API_URL = "https://ai-hybrid-energy-source-predictor-production.up.railway.app/predict"
 
     response = requests.get(API_URL, params=params)
-    data = response.json()
+    if response.status_code != 200:
+        st.error(f"API Error: {response.text}")
+    else:
+        data = response.json()
+        st.write("API response:", data)
 
-    st.write("API Response:",data)
+    
 
     solar = data.get("solar_power", 0)
     wind = data.get("wind_power", 0)
