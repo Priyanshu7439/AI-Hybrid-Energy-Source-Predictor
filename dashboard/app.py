@@ -53,10 +53,21 @@ with col2:
 
 if st.button("Predict Energy"):
 
-    solar_input = np.array([[irradiation, temp, module, hour, day, month]])
-    wind_input = np.array([[wind_speed, direction, theoretical]])
+    params = {
+        "irradiation": irradiation,
+        "temperature": temp,
+        "module": module,
+        "hour": hour,
+        "day": day,
+        "month": month,
+        "wind_speed": wind_speed,
+        "direction": direction,
+        "theoretical": theoretical
+    }
 
-    response = requests.get("http://127.0.0.1:8000/predict")
+    API_URL = "https://ai-hybrid-energy-source-predictor-production.up.railway.app/predict"
+
+    response = requests.get(API_URL, params=params)
     data = response.json()
 
     solar = data["solar_power"]
