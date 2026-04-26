@@ -12,7 +12,7 @@ solar_model = joblib.load(ARTIFACT_PATH / "solar_model.pkl")
 wind_model = joblib.load(ARTIFACT_PATH / "wind_model.pkl")
 
 
-@router.get("/predict")
+
 @router.get("/predict")
 def predict_energy(
     irradiation: float,

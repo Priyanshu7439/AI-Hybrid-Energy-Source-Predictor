@@ -70,10 +70,12 @@ if st.button("Predict Energy"):
     response = requests.get(API_URL, params=params)
     data = response.json()
 
-    solar = data["solar_power"]
-    wind = data["wind_power"]
-    total = data["total_energy"]
-    source = data["recommended_source"]
+    st.write("API Response:",data)
+
+    solar = data.get("solar_power", 0)
+    wind = data.get("wind_power", 0)
+    total = data.get("total_energy", 0)
+    source = data.get("recommended_source", "Unknown")
 
     st.metric("Solar Power", round(solar,2))
     st.metric("Wind Power", round(wind,2))
