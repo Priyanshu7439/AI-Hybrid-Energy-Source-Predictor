@@ -52,7 +52,7 @@ def health_check():
 
 
 @router.post("/predict", response_model=PredictionResponse)
-def predict_energy(request: PredictionRequest = Depends()):
+def predict_energy(request: PredictionRequest):
     """
     Predict energy output from solar and wind sources.
     
