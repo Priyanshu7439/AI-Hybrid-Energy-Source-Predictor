@@ -92,7 +92,7 @@ def predict_energy(request: PredictionRequest):
         ]], columns=[
             "Wind Speed (m/s)",
             "Wind Direction (°)",
-            "Theoretical_Power_Curve (kWh)"
+            "Theoretical_Power_Curve (KWh)"
         ])
         print("solar_input:" ,solar_features)
         print("wind_input:" ,wind_features)
