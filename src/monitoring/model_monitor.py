@@ -32,5 +32,4 @@ class PredictionLogger:
             with open(self.log_path, "a") as f:
                 f.write(json.dumps(record) + "\n")
         except Exception as e:
-            # Silently fail logging to not break predictions
             pass

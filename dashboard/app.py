@@ -14,7 +14,6 @@ from requests.adapters import HTTPAdapter
 
 from src.llm_agent.energy_advisor import explain_energy
 
-# Load environment variables
 load_dotenv()
 
 st.set_page_config(page_title="AI Hybrid Energy Platform", layout="wide")
@@ -72,15 +71,12 @@ if st.button("🔮 Predict Energy", use_container_width=True):
         "theoretical": theoretical
     }
 
-    # Get API URL from environment variable
     API_URL = "https://ai-hybrid-energy-source-predictor-production.up.railway.app/predict"
 
     try:
-        # Use session with retries
         session = create_session_with_retries()
-        response = session.get(API_URL, params=params, timeout=10)
+        response = session.post(API_URL, json=params, timeout=10)
         
-        # Check HTTP status
         if response.status_code != 200:
             try:
                 error_msg = response.json().get("detail", response.text)
@@ -89,21 +85,18 @@ if st.button("🔮 Predict Energy", use_container_width=True):
             st.error(f"❌ API Error {response.status_code}: {error_msg}")
             st.stop()
         
-        # Validate JSON response
         try:
             data = response.json()
         except (requests.exceptions.JSONDecodeError, ValueError):
             st.error("❌ API returned invalid JSON. The server might be returning an error page.")
             st.stop()
         
-        # Validate response structure
         required_fields = ["solar_power", "wind_power", "total_energy", "recommended_source"]
         missing_fields = [f for f in required_fields if f not in data]
         if missing_fields:
             st.error(f"❌ API response missing fields: {', '.join(missing_fields)}")
             st.stop()
 
-        # Extract and validate data types
         try:
             solar = float(data["solar_power"])
             wind = float(data["wind_power"])
@@ -115,7 +108,6 @@ if st.button("🔮 Predict Energy", use_container_width=True):
 
         st.write("✅ API response:", data)
 
-        # Display metrics
         col_solar, col_wind, col_total = st.columns(3)
         with col_solar:
             st.metric("☀️ Solar Power", f"{round(solar, 2)} kW")
@@ -126,7 +118,7 @@ if st.button("🔮 Predict Energy", use_container_width=True):
 
         st.success(f"✅ Recommended Source: **{source}**")
 
-        # Display chart
+        #chart
         chart_data = {
             "source": ["Solar", "Wind"],
             "energy": [solar, wind]
@@ -143,7 +135,6 @@ if st.button("🔮 Predict Energy", use_container_width=True):
         )
         st.plotly_chart(fig, use_container_width=True)
 
-        # Display optimization details
         st.subheader("📊 Hybrid Optimization")
         st.write(f"""
         - **Solar Output**: {round(solar, 2)} kW
@@ -152,7 +143,7 @@ if st.button("🔮 Predict Energy", use_container_width=True):
         - **Better Source**: {source} ({round(max(solar, wind), 2)} kW)
         """)
 
-        # Display AI advisor explanation
+        #AI advisor explanation
         explanation = explain_energy(source)
         st.subheader("🤖 AI Energy Advisor")
         st.info(explanation)

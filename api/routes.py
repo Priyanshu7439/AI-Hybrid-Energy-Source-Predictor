@@ -15,13 +15,10 @@ load_dotenv()
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-# Use absolute path or environment variable for production
 ARTIFACT_PATH = Path(os.getenv("MODEL_PATH", "artifacts")).resolve()
 
-# Initialize prediction logger
 predictor_logger = PredictionLogger()
 
-# Load models with error handling
 solar_model = None
 wind_model = None
 
@@ -42,7 +39,7 @@ except Exception as e:
     logger.error(f"Error loading wind model: {e}")
 
 
-@router.get("/health")
+@router.post("/health")
 def health_check():
     """Check if models are loaded and API is healthy"""
     return {
@@ -54,7 +51,7 @@ def health_check():
     }
 
 
-@router.get("/predict", response_model=PredictionResponse)
+@router.post("/predict", response_model=PredictionResponse)
 def predict_energy(request: PredictionRequest = Depends()):
     """
     Predict energy output from solar and wind sources.
@@ -62,7 +59,7 @@ def predict_energy(request: PredictionRequest = Depends()):
     Pydantic automatically validates all input ranges.
     """
     
-    # Validate model availability
+    
     if solar_model is None or wind_model is None:
         logger.error("Models not loaded")
         raise HTTPException(
@@ -71,27 +68,39 @@ def predict_energy(request: PredictionRequest = Depends()):
         )
     
     try:
-        # Create DataFrames to maintain feature names (required for some XGBoost/SKLearn versions)
-        solar_features = pd.DataFrame([{
-            "IRRADIATION": request.irradiation,
-            "AMBIENT_TEMPERATURE": request.temperature,
-            "MODULE_TEMPERATURE": request.module,
-            "hour": request.hour,
-            "day": request.day,
-            "month": request.month
-        }])
-        
-        wind_features = pd.DataFrame([{
-            "Wind Speed (m/s)": request.wind_speed,
-            "Wind Direction (°)": request.direction,
-            "Theoretical_Power_Curve (KWh)": request.theoretical
-        }])
 
-        # Get predictions
+        solar_features = pd.DataFrame([[
+        request.irradiation,
+        request.temperature,
+        request.module,
+        request.hour,
+        request.day,
+        request.month
+        ]], columns=[
+            "IRRADIATION",
+            "AMBIENT_TEMPERATURE",
+            "MODULE_TEMPERATURE",
+            "hour",
+            "day",
+            "month"
+        ])
+        
+        wind_features = pd.DataFrame([[
+            request.wind_speed,
+            request.direction,
+            request.theoretical
+        ]], columns=[
+            "Wind Speed (m/s)",
+            "Wind Direction (°)",
+            "Theoretical_Power_Curve (kWh)"
+        ])
+        print("solar_input:" ,solar_features)
+        print("wind_input:" ,wind_features)
+
+       
         solar = float(solar_model.predict(solar_features)[0])
         wind = float(wind_model.predict(wind_features)[0])
 
-        # Ensure predictions are valid numbers
         if np.isnan(solar) or np.isnan(wind):
             logger.error(f"Model returned NaN: solar={solar}, wind={wind}")
             raise HTTPException(
@@ -106,10 +115,9 @@ def predict_energy(request: PredictionRequest = Depends()):
                 detail="Model returned invalid prediction (Inf)"
             )
 
-        # Get optimization result
+        
         result = optimize_energy(solar, wind)
         
-        # Log prediction for monitoring
         predictor_logger.log_prediction(
             inputs={
                 "irradiation": request.irradiation,
@@ -132,7 +140,6 @@ def predict_energy(request: PredictionRequest = Depends()):
         return result
         
     except HTTPException:
-        # Re-raise HTTP exceptions
         raise
     except ValueError as e:
         logger.error(f"Validation error: {e}")
