@@ -73,7 +73,7 @@ if st.button("🔮 Predict Energy", use_container_width=True):
     }
 
     # Get API URL from environment variable
-    API_URL = os.getenv("API_URL", "http://localhost:8000") + "/predict"
+    API_URL = "https://ai-hybrid-energy-source-predictor-production.up.railway.app/predict"
 
     try:
         # Use session with retries
